@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.vr.active.mapper.DeviceInfoMapper">
+	<resultMap id="BaseResultMap" type="com.vr.active.model.DeviceInfo">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="account" property="account" jdbcType="VARCHAR" />
+		<result column="username" property="username" jdbcType="VARCHAR" />
+		<result column="password" property="password" jdbcType="VARCHAR" />
+		<result column="device_mac" property="deviceMac" jdbcType="VARCHAR" />
+		<result column="device_code" property="deviceCode" jdbcType="VARCHAR" />
+		<result column="device_name" property="deviceName" jdbcType="VARCHAR" />
+		<result column="site_name" property="siteName" jdbcType="VARCHAR" />
+		<result column="province_code" property="provinceCode"
+			jdbcType="VARCHAR" />
+		<result column="city_code" property="cityCode" jdbcType="VARCHAR" />
+		<result column="site_code" property="siteCode" jdbcType="VARCHAR" />
+		<result column="is_sync" property="isSync" jdbcType="VARCHAR" />
+		<result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+	</resultMap>
+	<sql id="Base_Column_List">
+		id, account, username, password, device_mac, device_code,
+		device_name,
+		site_name,
+		province_code, city_code, site_code, is_sync,
+		create_time
+	</sql>
+	<select id="selectByPrimaryKey" resultMap="BaseResultMap"
+		parameterType="java.lang.Integer">
+		select
+		<include refid="Base_Column_List" />
+		from device_info
+		where id = #{id,jdbcType=INTEGER}
+	</select>
+	
+	<select id="getNoSync" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from device_info
+		where is_sync !='yes' OR is_sync is null
+	</select>
+	<select id="getAllDevices" resultMap="BaseResultMap" >
+		select
+		<include refid="Base_Column_List" />
+		from device_info
+	</select>
+	
+	
+	
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+		delete from
+		device_info
+		where id = #{id,jdbcType=INTEGER}
+	</delete>
+	<insert id="insert" parameterType="com.vr.active.model.DeviceInfo">
+		insert into device_info (id,
+		account, username,
+		password, device_mac, device_code,
+		device_name,
+		site_name, province_code,
+		city_code, site_code, is_sync,
+		create_time)
+		values (#{id,jdbcType=INTEGER}, #{account,jdbcType=VARCHAR},
+		#{username,jdbcType=VARCHAR},
+		#{password,jdbcType=VARCHAR},
+		#{deviceMac,jdbcType=VARCHAR}, #{deviceCode,jdbcType=VARCHAR},
+		#{deviceName,jdbcType=VARCHAR}, #{siteName,jdbcType=VARCHAR},
+		#{provinceCode,jdbcType=VARCHAR},
+		#{cityCode,jdbcType=VARCHAR},
+		#{siteCode,jdbcType=VARCHAR}, #{isSync,jdbcType=VARCHAR},
+		#{createTime,jdbcType=TIMESTAMP})
+	</insert>
+	<insert id="insertSelective" parameterType="com.vr.active.model.DeviceInfo">
+		insert into device_info
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				id,
+			</if>
+			<if test="account != null">
+				account,
+			</if>
+			<if test="username != null">
+				username,
+			</if>
+			<if test="password != null">
+				password,
+			</if>
+			<if test="deviceMac != null">
+				device_mac,
+			</if>
+			<if test="deviceCode != null">
+				device_code,
+			</if>
+			<if test="deviceName != null">
+				device_name,
+			</if>
+			<if test="siteName != null">
+				site_name,
+			</if>
+			<if test="provinceCode != null">
+				province_code,
+			</if>
+			<if test="cityCode != null">
+				city_code,
+			</if>
+			<if test="siteCode != null">
+				site_code,
+			</if>
+			<if test="isSync != null">
+				is_sync,
+			</if>
+			<if test="createTime != null">
+				create_time,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				#{id,jdbcType=INTEGER},
+			</if>
+			<if test="account != null">
+				#{account,jdbcType=VARCHAR},
+			</if>
+			<if test="username != null">
+				#{username,jdbcType=VARCHAR},
+			</if>
+			<if test="password != null">
+				#{password,jdbcType=VARCHAR},
+			</if>
+			<if test="deviceMac != null">
+				#{deviceMac,jdbcType=VARCHAR},
+			</if>
+			<if test="deviceCode != null">
+				#{deviceCode,jdbcType=VARCHAR},
+			</if>
+			<if test="deviceName != null">
+				#{deviceName,jdbcType=VARCHAR},
+			</if>
+			<if test="siteName != null">
+				#{siteName,jdbcType=VARCHAR},
+			</if>
+			<if test="provinceCode != null">
+				#{provinceCode,jdbcType=VARCHAR},
+			</if>
+			<if test="cityCode != null">
+				#{cityCode,jdbcType=VARCHAR},
+			</if>
+			<if test="siteCode != null">
+				#{siteCode,jdbcType=VARCHAR},
+			</if>
+			<if test="isSync != null">
+				#{isSync,jdbcType=VARCHAR},
+			</if>
+			<if test="createTime != null">
+				#{createTime,jdbcType=TIMESTAMP},
+			</if>
+		</trim>
+	</insert>
+	<update id="updateByPrimaryKeySelective" parameterType="com.vr.active.model.DeviceInfo">
+		update device_info
+		<set>
+			<if test="account != null">
+				account = #{account,jdbcType=VARCHAR},
+			</if>
+			<if test="username != null">
+				username = #{username,jdbcType=VARCHAR},
+			</if>
+			<if test="password != null">
+				password = #{password,jdbcType=VARCHAR},
+			</if>
+			<if test="deviceMac != null">
+				device_mac = #{deviceMac,jdbcType=VARCHAR},
+			</if>
+			<if test="deviceCode != null">
+				device_code = #{deviceCode,jdbcType=VARCHAR},
+			</if>
+			<if test="deviceName != null">
+				device_name = #{deviceName,jdbcType=VARCHAR},
+			</if>
+			<if test="siteName != null">
+				site_name = #{siteName,jdbcType=VARCHAR},
+			</if>
+			<if test="provinceCode != null">
+				province_code = #{provinceCode,jdbcType=VARCHAR},
+			</if>
+			<if test="cityCode != null">
+				city_code = #{cityCode,jdbcType=VARCHAR},
+			</if>
+			<if test="siteCode != null">
+				site_code = #{siteCode,jdbcType=VARCHAR},
+			</if>
+			<if test="isSync != null">
+				is_sync = #{isSync,jdbcType=VARCHAR},
+			</if>
+			<if test="createTime != null">
+				create_time = #{createTime,jdbcType=TIMESTAMP},
+			</if>
+		</set>
+		where id = #{id,jdbcType=INTEGER}
+	</update>
+	<update id="updateByPrimaryKey" parameterType="com.vr.active.model.DeviceInfo">
+		update device_info
+		set account = #{account,jdbcType=VARCHAR},
+		username =
+		#{username,jdbcType=VARCHAR},
+		password = #{password,jdbcType=VARCHAR},
+		device_mac = #{deviceMac,jdbcType=VARCHAR},
+		device_code =
+		#{deviceCode,jdbcType=VARCHAR},
+		device_name =
+		#{deviceName,jdbcType=VARCHAR},
+		site_name =
+		#{siteName,jdbcType=VARCHAR},
+		province_code =
+		#{provinceCode,jdbcType=VARCHAR},
+		city_code =
+		#{cityCode,jdbcType=VARCHAR},
+		site_code = #{siteCode,jdbcType=VARCHAR},
+		is_sync = #{isSync,jdbcType=VARCHAR},
+		create_time =
+		#{createTime,jdbcType=TIMESTAMP}
+		where id = #{id,jdbcType=INTEGER}
+	</update>
+	
+	
+	<update id="updateSync">
+		update device_info
+		set is_sync = 'yes'
+	</update>
+
+	<delete id="deleteAllDeviceInfo">
+		delete from device_info  where 1=1
+	</delete>
+
+</mapper>
