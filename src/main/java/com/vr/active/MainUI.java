@@ -3,11 +3,8 @@ package com.vr.active;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Scanner;
-import java.util.UUID;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -19,15 +16,14 @@ import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import com.alibaba.fastjson.JSONObject;
 import com.vr.active.common.SysConstants;
 import com.vr.active.common.SystemCache;
+import com.vr.active.common.db.DBUtils;
 import com.vr.active.common.util.HttpRequest;
 import com.vr.active.common.util.MD5Util;
 import com.vr.active.common.util.Result;
-import com.vr.active.mapper.DeviceInfoMapper;
 import com.vr.active.model.DeviceInfo;
 
 /**
@@ -39,9 +35,6 @@ public class MainUI extends JFrame {
     private JTextField usernameTextField;
     private JPasswordField passwordField;
     private JTextField deviceNameField;
-
-    @Autowired
-    private DeviceInfoMapper deviceInfoMapper;
 
 
     /**
@@ -138,26 +131,29 @@ public class MainUI extends JFrame {
                     warnDialog(warnMsg.toString());
                     return;
                 }
-                String uniqueCode = getComputerUIID();
-                if("errorMsgVr".equals(uniqueCode)){
-                    warnDialog("取得机器唯一码失败,请联系管理员!");
-                    return;
-                }
-
+                String mac = SystemUtil.getSystemMac();
+                if (StringUtils.isEmpty(mac)) {
+                	 warnDialog("获取网络地址出错，请检查网络是否畅通");
+                	 return;
+				}
                 DeviceInfo deviceInfo = new DeviceInfo();
-//                deviceInfo.setUsername(userName);
                 deviceInfo.setAccount(userName);
-                deviceInfo.setPassword(passWord);
-                deviceInfo.setDeviceMac(uniqueCode);
-                deviceInfo.setDeviceCode(uniqueCode);
+                deviceInfo.setPassword(MD5Util.MD5(passWord));
+                deviceInfo.setDeviceMac(mac);
+                deviceInfo.setDeviceCode(userName+"_"+mac);
                 deviceInfo.setDeviceName(deviceName);
 
                 //线上请求 如果成功 则提示成功，如果失败则重新录入
                 if(requetServer(warnMsg,deviceInfo)){
-                    deviceInfoMapper.deleteAllDeviceInfo();
-                    deviceInfoMapper.insert(deviceInfo);
-                    warnDialog("授权成功!");
-                    setVisible(false);
+                	DBUtils.deleteAll();
+                	deviceInfo.setIsSync(DeviceInfo.Sync.YES.getValue());
+                	if (DBUtils.insert(deviceInfo)>0) {
+                		 warnDialog("授权成功!");
+                		 setVisible(false);
+//                		 System.exit(NORMAL);
+					}else{
+						warnDialog("保存信息失败!");
+					}
                 }else{
                     warnDialog(warnMsg.toString());
                 }
@@ -200,18 +196,16 @@ public class MainUI extends JFrame {
             try {
                 Result result = JSONObject.parseObject(resultStr, Result.class);
                 if (result!=null) {
-                    if (Result.Code.SUCCESS.getValue().equals(result.getCode())) {
-                        deviceInfo = JSONObject.parseObject(result.getMessage(),DeviceInfo.class);
-                       return true;
-                    }else
-                    {
-                        warnMsg.append(result.getMessage());
-
-                    }
+                	if (Result.Code.SUCCESS.getValue().equals(result.getCode())) {
+						return true;
+					}else{
+						warnMsg.append(result.getMessage());
+						return false;
+					}
                 }else
                 {
                     warnMsg.append("请求超时");
-
+                    return false;
                 }
 
             } catch (Exception e) {
@@ -223,38 +217,9 @@ public class MainUI extends JFrame {
         return false;
     }
     private String bulidRequesUrl(String path){
-        String domain = SystemCache.getSysConfigVauleByKey(SysConstants.SERVER_DOMAIN);
-        path = SystemCache.getSysConfigVauleByKey(path);
+        String domain = SystemCache.getSysConfigByKey(SysConstants.SERVER_DOMAIN);
+        path = SystemCache.getSysConfigByKey(path);
         return domain+path;
-    }
-
-    /**
-     * Author:Halo
-     * methods:
-     * params:
-     * Time: 2016/8/09 20:43
-     * return:
-     * description:获取电脑序列号，作为唯一值
-     */
-    private String getComputerUIID(){
-
-    	return UUID.randomUUID().toString();
-//        Process process ;
-//        Scanner sc = null;
-//        try {
-//            process = Runtime.getRuntime().exec(
-//                    new String[] { "wmic", "cpu", "get", "ProcessorId" });
-//
-//            process.getOutputStream().close();
-//            sc= new Scanner(process.getInputStream());
-//            String serial = sc.next();
-//            return serial;
-//        } catch (IOException e) {
-//            return "errorMsgVr";
-//        }finally {
-//            if(sc!=null)
-//                sc.close();
-//        }
     }
 
     /**

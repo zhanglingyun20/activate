@@ -1,10 +1,7 @@
 package com.vr.active;
 
-import org.apache.log4j.Logger;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
-
 import com.vr.active.common.SystemCache;
+import com.vr.active.common.db.DBUtils;
 /**
  * 程序入口
  * @author sawyer
@@ -12,13 +9,11 @@ import com.vr.active.common.SystemCache;
  */
 public class ActivateMain {
 
-	private static Logger logger  =  Logger.getLogger(ActivateMain.class );
 	public static void main(String[] args) {
-		
-		ApplicationContext context = new ClassPathXmlApplicationContext("classpath:spring-context.xml");
-		SpringContext.setApplicationContext(context);
-		if(SystemCache.initCache()) {
+		if(DBUtils.test()&&SystemCache.initCache()) {
 			new MainUI(true);
+		}else{
+			System.out.println("加载数据库失败");
 		}
 	}
 }
